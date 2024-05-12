@@ -17,7 +17,8 @@ const Posts = () => {
     if (UserData.id) {
       const fetchUserPosts = async () => {
         try {
-          serverRequests('GET', `posts?userId=${UserData.id}`, null).then((postData) => {
+          console.log('id:',UserData.id)
+          serverRequests('GET', `posts?user_id=${UserData.id}`, null).then((postData) => {
             setUserPosts(postData)
             setUserPostsSearch(postData)
           })
@@ -31,8 +32,16 @@ const Posts = () => {
   }, [UserData.id]);
 
   const handleDeletePost = async (postId) => {
+    const findPost=userPosts.find((post) => post.id === postId) ;
+    
+    const postToDelete = {
+      id:postId,
+      user_id: UserData.id,
+      title: findPost.title,
+      body: findPost.body,
+    }
     try {
-      serverRequests('DELETE', `posts/${postId}`, null).then(() => {
+      serverRequests('DELETE', `posts/${postId}`, postToDelete).then(() => {
         const updatedposts = userPosts.filter((post) => post.id !== postId);
         setUserPosts(updatedposts);
         setUserPostsSearch(updatedposts)
@@ -58,15 +67,15 @@ const Posts = () => {
 
   const handleAddPost = async () => {
     const postToAdd = {
-      userId: UserData.id,
+      user_id: UserData.id,
       title: newPostTitle,
       body: newPostBody,
     }
 
     try {
       serverRequests('POST', `posts`, postToAdd).then((newPost) => {
-          setUserPosts([...userPosts, newPost])
-          setUserPostsSearch([...userPosts, newPost])
+          setUserPosts(newPost)
+          setUserPostsSearch(newPost)
           setNewPostTitle('');
           setNewPostBody('');
         })
@@ -132,9 +141,9 @@ const Posts = () => {
       </div>
 
 
-      {userPostsSearch.map((post, index) => (
-        <div className='post-item'>
-          <Post key={index} post={post} handleSaveClick={handleSaveClick} handleDeletePost={handleDeletePost} />
+      {userPostsSearch.map((post, key) => (
+        <div key={key} className='post-item'>
+          <Post key={key} post={post} handleSaveClick={handleSaveClick} handleDeletePost={handleDeletePost} />
         </div>
       ))}
 

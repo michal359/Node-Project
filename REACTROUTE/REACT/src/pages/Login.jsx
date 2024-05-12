@@ -23,13 +23,12 @@ const Login = ({ setUserData }) => {
     const fetchUsers = async () => {
       try {
         serverRequests('GET', `login?username=${userToCheck.username}&password=${userToCheck.password}`, null).then((user) => {
-          if (user[0] != null) {
+          if (user.id) {
           console.log('User data:', user);
-          setUserData(user[0]);
-          alert(`Login successful! Welcome back ${user[0].username}😎`);
-          const { password, ...userInLocalStorage } = user[0];
-          localStorage.setItem('loggedInUser', JSON.stringify(userInLocalStorage));
-          console.log('Stored user data:', userInLocalStorage);
+          setUserData(user);
+          alert(`Login successful! Welcome back ${user.username}😎`);
+          localStorage.setItem('loggedInUser', JSON.stringify(user));
+          console.log('Stored user data:', user);
           navigate(`/home`);
           } else {
             alert("Login failed. Invalid username or password.");
